@@ -11,10 +11,33 @@
 
 get_row <- function(row, data, skip = 0) {
 
+  # Take a row from the dataset
+  a <- data %>%
+    select(-1, -2) %>%
+    slice(row) %>%
+    unlist(., use.names=FALSE)
+
+  suppressWarnings(
+    if (class(a) == "character") a <- as.numeric(a)
+  )
+
+
+
   # Set reverse option:
   reverse <- FALSE
-  rev_char <- as.character(data[row, ncol(data)])
-  if(grepl("(W|w)ors", rev_char)) reverse <- TRUE
+
+  # Is there a 'reverse' column? (ie one containing 'higher number'?)
+  columns <- ncol(data)
+
+  if (grepl("(H|h)igh", names(data)[columns])) {
+
+    rev_char <- as.character(data[row, columns])
+    if(grepl("(W|w)ors", rev_char)) reverse <- TRUE
+
+    # Then drop the reverse column if it exists:
+    a <- a[1:(length(a)-1)]
+
+  }
 
   # The end of the line will be "\\ \whitemid" unless it is the last in a chapter's metrics
   endLine <- "\\\\ \\whitemid"
@@ -55,21 +78,12 @@ get_row <- function(row, data, skip = 0) {
   # (initially reversed to make "a" mean the highest number)
   codes <- rev(letters[1:11])
 
-  # And reverse if required (not active yet)
+  # And reverse if required
   if (reverse) codes <- rev(codes)
 
-  # Take a row:
-  a <- data %>%
-    select(-1, -2) %>%
-    slice(row) %>%
-    unlist(., use.names=FALSE)
-
-  suppressWarnings(
-    if (class(a) == "character") a <- as.numeric(a)
-  )
 
 
-  # Get median and sd
+  # Get median and sd of the row
   med <- stats::median(a, na.rm = T)
   sd <- stats::sd(a, na.rm = T)
 

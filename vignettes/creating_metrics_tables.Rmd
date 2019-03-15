@@ -48,3 +48,11 @@ make_metrics_table(metrics)
 ```
 
 This will produce a `metrics_table.tex` file that contains the 'innards' of the table (i.e. the metrics rows of the table) that can be copied-and-pasted into the table you have built.
+
+# Reversing colour order
+The function will look for the word 'higher' in the final column. If it is found, it will designate that column as a reversal instructions where:
+
+"Higher number is..."
+* "better": highest numbers will be yellow; lowest numbers will be red.
+* "worse":  **reversed** lowest numbers will be yellow; highest numbers will be red.
+
