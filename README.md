@@ -23,7 +23,7 @@ The first of two steps is to read the Google Sheets metrics table. You'll have t
 # You will need to allow the googlesheets API access to your account
 metrics <- read_sheet("1p2oz-9s29IN4M7paosSEG24A3GwVn3uskXP0-3npd4Q", 
                       sheet = "Metric", 
-                      range = "A1:L42",
+                      range = "A1:M42",
                       col_types = "c")
 ```
 

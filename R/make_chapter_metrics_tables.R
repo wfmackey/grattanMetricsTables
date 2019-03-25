@@ -56,6 +56,11 @@ newdata <- tibble(lines = useLines) %>%
   # Remove \\whitespace from last column
   mutate_all(function(x) gsub("\\\\\\\\  ?\\\\[a-z]*id", "", x))
 
+# Remove 'reverse' column if exists
+columns <- ncol(newdata)
+if (grepl("(H|h)igh", names(newdata)[columns])) newdata <- newdata[1:(columns-1)]
+
+
 
 create_chapter_metrics <- function(useChapter) {
 
@@ -78,12 +83,26 @@ create_chapter_metrics <- function(useChapter) {
   names_line <- chap_header %>% pull(metric_names) %>% str_c(collapse = "   &   ") %>% str_c("&   ", ., " \\\\")
   units_line <- chap_header %>% pull(metric_units) %>% str_c(collapse = "   &   ") %>% str_c("&   ", ., " \\\\")
 
+
   # Transpose a chapter's bulk
-  chap <- newdata %>%
-    filter(chapter == useChapter) %>%
-    select(-1) %>%
-    gather(var, val, 2:ncol(.)) %>%
-    spread(metric, val)
+  transpose_bulk <- function(metric) {
+  a <-
+  newdata %>%
+    filter(chapter == useChapter,
+           !is.na(Australia)) %>%
+    select(-1)
+
+  return(t(a[metric,])[-1,])
+  }
+
+
+  chap <- transpose_bulk(1)
+
+  if (number_of_metrics >= 2) chap <- cbind(chap, transpose_bulk(2))
+  if (number_of_metrics >= 3) chap <- cbind(chap, transpose_bulk(3))
+  if (number_of_metrics >= 4) chap <- cbind(chap, transpose_bulk(4))
+  if (number_of_metrics >= 5) chap <- cbind(chap, transpose_bulk(5))
+  if (number_of_metrics >= 6) chap <- cbind(chap, transpose_bulk(6))
 
 
   create_lines <- function(x) {
@@ -141,4 +160,3 @@ purrr::map(chapters %>% pull() %>% unique(), create_chapter_metrics)
 
 
 }
-
