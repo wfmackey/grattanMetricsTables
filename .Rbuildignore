@@ -1,3 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ob_test
+chapter_tables
+metrics_table.tex
