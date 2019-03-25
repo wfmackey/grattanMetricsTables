@@ -17,10 +17,17 @@ get_row <- function(row, data, skip = 0) {
     slice(row) %>%
     unlist(., use.names=FALSE)
 
-  suppressWarnings(
-    if (class(a) == "character") a <- as.numeric(a)
-  )
+  # Test if character row using perm_chars
+  pos_chars <- c("Yes", "High", "Good")
+  neg_chars <- c("No", "Low", "Bad")
+  perm_chars <- c(pos_chars, neg_chars)
 
+  if (sum(a %in% perm_chars) > 1) {
+    char_row <- TRUE
+  } else {
+    char_row <- FALSE
+    suppressWarnings(if (class(a) == "character") a <- as.numeric(a))
+  }
 
 
   # Set reverse option:
@@ -83,34 +90,55 @@ get_row <- function(row, data, skip = 0) {
 
 
 
-  # Get median and sd of the row
-  med <- stats::median(a, na.rm = T)
-  sd <- stats::sd(a, na.rm = T)
-
-  # Create empty object to fill
-  b <- NULL
+  # If numeric, get median and sd of the row
+  if (!char_row) {
+    med <- stats::median(a, na.rm = T)
+    sd <- stats::sd(a, na.rm = T)
+  }
 
   set_colours <- function(x) {
 
-    if (!is.na(a[x])) {
-      col <- codes[1]
-      if(a[x] >= med - 1.5*sd) col <- codes[2]
-      if(a[x] >= med - 1.0*sd) col <- codes[3]
-      if(a[x] >= med - 0.5*sd) col <- codes[4]
-      if(a[x] >= med - 0.3*sd) col <- codes[5]
-      if(a[x] >= med)          col <- codes[6]
-      if(a[x] >= med + 0.3*sd) col <- codes[7]
-      if(a[x] >= med + 0.5*sd) col <- codes[8]
-      if(a[x] >= med + 1.0*sd) col <- codes[9]
-      if(a[x] >= med + 1.5*sd) col <- codes[10]
-      if(a[x] >= med + 2.0*sd) col <- codes[11]
+    # If a character row:
+    if (char_row) {
+      col <- case_when(
+        a[x] %in% pos_chars ~ "b",
+        a[x] %in% neg_chars ~ "j",
+        a[x] == "-" ~ "z",
+        TRUE ~ "f"
+        )
 
-      col <- paste0("  & \\q", col, "  " , a[x], "  ")
-    } else {
-      col <- "  &  \\qz  "
+      col <- str_c("  & \\q", col, "  " , a[x], "  ")
+
+      # Return and send message
+      print(paste0(a[x], " is ", col))
+      return(col)
+
     }
+
+    if (!char_row) {
+
+      if (!is.na(a[x])) {
+        col <- codes[1]
+        if(a[x] >= med - 1.5*sd) col <- codes[2]
+        if(a[x] >= med - 1.0*sd) col <- codes[3]
+        if(a[x] >= med - 0.5*sd) col <- codes[4]
+        if(a[x] >= med - 0.3*sd) col <- codes[5]
+        if(a[x] >= med)          col <- codes[6]
+        if(a[x] >= med + 0.3*sd) col <- codes[7]
+        if(a[x] >= med + 0.5*sd) col <- codes[8]
+        if(a[x] >= med + 1.0*sd) col <- codes[9]
+        if(a[x] >= med + 1.5*sd) col <- codes[10]
+        if(a[x] >= med + 2.0*sd) col <- codes[11]
+
+        col <- str_c("  & \\q", col, "  " , a[x], "  ")
+      } else {
+        col <- "  &  \\qz  "
+      }
+
+      # Return and send message
     print(paste0(a[x], " is ", col))
     return(col)
+    }
   }
 
   # Run on row
