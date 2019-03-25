@@ -10,7 +10,10 @@ Imports:
     dplyr,
     googlesheets4,
     purrr,
-    readr
+    readr,
+    zoo,
+    stringr,
+    tidyr
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

@@ -1,5 +1,5 @@
 #' Make a metrics table for Grattan
-#' @name make_metrics_table
+#' @name make_metrics_tables
 #' @param data The data you want to convert into a metrics table.
 #' Note that it should be in the format of a metrics table.
 #'
@@ -12,7 +12,7 @@
 globalVariables(c("Australia", "metrics", "."))
 
 
-make_metrics_table <- function(data) {
+make_metrics_tables <- function(data) {
 
   # Remove rows that don't have an Australia value (ie gap rows)
   data <- dplyr::filter(data, !is.na(Australia))
@@ -27,7 +27,10 @@ make_metrics_table <- function(data) {
                  "\n",
                  "(Make sure to give it a good once-over, though)"))
 
-  return(lines)
+
+  # Make chapter metrics tables with the same data
+  make_chapter_metrics_tables(data, useLines = lines)
+
 }
 
 

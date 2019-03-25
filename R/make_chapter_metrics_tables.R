@@ -1,35 +1,53 @@
+#' Make a individual chapter's metrics tables
+#' @name make_chapter_metrics_tables
+#' @param data The data you want to convert into a metrics table.
+#' Note that this should be downloaded from the Google Doc (see 'get_metrics_data()')
+#' @param useLines The vector of bulk lines from the main metrics table.
+#'
+#' @import dplyr
+#' @import stringr
+#' @import tidyr
+#' @import zoo
+#'
 
-library(googlesheets4)
-library(tidyverse)
-library(zoo)
-
-metrics <- read_sheet("1p2oz-9s29IN4M7paosSEG24A3GwVn3uskXP0-3npd4Q",
-                      sheet = "Metric",
-                      range = "A1:L42",
-                      col_types = "c")
+utils::globalVariables(c(".", "metric", "chapter", "lines", "separate",
+                         "create_chapter_metrics", "val", "var"))
 
 
-lines <- make_metrics_table(metrics)
+make_chapter_metrics_tables <- function(data,
+                                        useLines) {
 
 # Clean data
-data <- metrics %>%
-filter(!is.na(Australia))
-
-# Get chapter list
-chapters <- metrics %>%
-  select(chapter = 1) %>%
+data <- data %>%
+  rename(chapter = 1,
+         metric = 2) %>%
+  filter(!is.na(Australia)) %>%
   do(na.locf(.))
 
+
+# Get chapter list
+chapters <- data %>%
+  select(chapter)
+
+
 # Get metric names list
-metric_names <- metrics %>%
-  select(metric = 2) %>%
-  mutate(metric = gsub("(.*?)\\(([^\\)]*)\\)", ""))
+metric_names <- data %>%
+  mutate(metric_names = gsub("([^\\(]*)\\(([^\\)]*)\\)", "\\1", metric)) %>%
+  mutate(metric_names = gsub("\\%", "\\\\%", metric_names),
+         metric_names = gsub("\\$", "\\\\$", metric_names)) %>%
+  select(metric_names)
+
+metric_units <- data %>%
+  mutate(metric_units = gsub("(.*?)\\((.*)\\)", "\\2", metric)) %>%
+  mutate(metric_units = gsub("\\%", "\\\\%", metric_units),
+         metric_units = gsub("\\$", "\\\\$", metric_units)) %>%
+  select(metric_units)
+
+header <- bind_cols(chapters, metric_names, metric_units)
 
 
-
-
-newdata <-
-  tibble(lines = lines) %>%
+# Create chart bulk
+newdata <- tibble(lines = lines) %>%
     separate(lines, names(metrics), "\\&") %>%
     select(-1) %>%
     rename(metric = 1) %>%
@@ -39,12 +57,29 @@ newdata <-
   mutate_all(function(x) gsub("\\\\\\\\  ?\\\\[a-z]*id", "", x))
 
 
+create_chapter_metrics <- function(useChapter) {
+
+  # Retrieve a chapter's metric names and labels
+  chap_header <- header %>%
+    filter(chapter == useChapter) %>%
+    select(-1)
+
+  # Determine column spacing
+    # Total width available to metrics (after countries) is 20.76em
+    number_of_metrics <- nrow(chap_header)
+    em <- 20.76 / number_of_metrics
 
 
-create_chapter_metrics <- function(newData, useChapter) {
+  # Add column spacing/formatting to header
+  chap_header <- chap_header %>%
+    mutate(metric_names = str_c("\\multicolumn{1}{p{", em, "em}}{\\textbf{", metric_names, "}}"),
+           metric_units = str_c("\\multicolumn{1}{p{", em, "em}}{\\textit{", metric_units, "}}"))
 
-  # Transpose a chapter's data
-  chap <- newData %>%
+  names_line <- chap_header %>% pull(metric_names) %>% str_c(collapse = "   &   ") %>% str_c("&   ", ., " \\\\")
+  units_line <- chap_header %>% pull(metric_units) %>% str_c(collapse = "   &   ") %>% str_c("&   ", ., " \\\\")
+
+  # Transpose a chapter's bulk
+  chap <- newdata %>%
     filter(chapter == useChapter) %>%
     select(-1) %>%
     gather(var, val, 2:ncol(.)) %>%
@@ -59,12 +94,51 @@ create_chapter_metrics <- function(newData, useChapter) {
                       create_lines) %>%
            unlist()
 
-  return(lines)
+
+  # Crate table environment preamble
+  chapter_lc <- tolower(useChapter)
+
+  Rs <- str_c(rep("r", number_of_metrics), collapse = "")
+  tabular_line <- str_c("\\begin{tabular}{l", Rs, "}", collapse = "")
+
+  chap_tex_name <- gsub(" ","-", tolower(useChapter))
+  caption_line <- str_c("\\caption{International scorecard on ", tolower(useChapter), "}\\label{tbl:key-performance-metrics-for-", chap_tex_name, "}",
+                        collapse = "")
+
+  table_preamble <- c("\\bgroup \\def\\arraystretch{1.75}",
+                      "\\begin{table}[htbp]",
+                      "\\centering",
+                      caption_line,
+                      "",
+                      tabular_line)
+
+  # And add header lines
+  lines <- c("%% Created by grattanMetricsTables. Make all data edits in the Google Doc.",
+             "",
+             "",
+             table_preamble,
+             "",
+             names_line,
+             "",
+             units_line,
+             "",
+             lines,
+             "",
+             "\\end{tabular}\\notes{See \\Chapref{chap:technical-appendix} for notes and sources.}",
+             "\\end{table}"
+             )
+
+  if(!dir.exists("chapter_tables")) dir.create("chapter_tables")
+  file_name <- str_c("chapter_tables/tbl-", chap_tex_name, ".tex")
+  readr::write_lines(lines, file_name)
+
+  return(print(str_c("Writing ", useChapter, " metrics table to ", file_name)))
 
 }
 
-create_chapter_metrics(newdata, "Economic development")
+
+purrr::map(chapters %>% pull() %>% unique(), create_chapter_metrics)
 
 
-lines
+}
 
