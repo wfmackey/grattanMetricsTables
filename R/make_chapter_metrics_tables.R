@@ -92,11 +92,13 @@ create_chapter_metrics <- function(useChapter) {
            !is.na(Australia)) %>%
     select(-1)
 
+
   return(t(a[metric,])[-1,])
   }
 
+  countries <- names(transpose_bulk(1))
 
-  chap <- transpose_bulk(1)
+  chap <- cbind(countries, transpose_bulk(1))
 
   if (number_of_metrics >= 2) chap <- cbind(chap, transpose_bulk(2))
   if (number_of_metrics >= 3) chap <- cbind(chap, transpose_bulk(3))
