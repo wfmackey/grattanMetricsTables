@@ -40,7 +40,7 @@ get_row <- function(row, data, skip = 0) {
   }
 
   # The end of the line will be "\\ \whitemid" unless it is the last in a chapter's metrics
-  endLine <- "\\\\ \\whitemid"
+  endLine <- "\\\\  \\whitemid"
 
   # Get the chapter name
   chap <- as.character(data[row, 1])

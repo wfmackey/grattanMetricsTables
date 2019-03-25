@@ -26,6 +26,8 @@ make_metrics_table <- function(data) {
   message(paste0("Yay! The table has been produced and exported as metrics_table.tex",
                  "\n",
                  "(Make sure to give it a good once-over, though)"))
+
+  return(lines)
 }
 
 
