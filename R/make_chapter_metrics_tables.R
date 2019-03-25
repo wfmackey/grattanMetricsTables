@@ -47,7 +47,7 @@ header <- bind_cols(chapters, metric_names, metric_units)
 
 
 # Create chart bulk
-newdata <- tibble(lines = lines) %>%
+newdata <- tibble(lines = useLines) %>%
     separate(lines, names(metrics), "\\&") %>%
     select(-1) %>%
     rename(metric = 1) %>%
