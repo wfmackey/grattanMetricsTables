@@ -12,21 +12,29 @@
 get_row <- function(row, data, skip = 0) {
 
   # Take a row from the dataset
-  a <- data %>%
+  origRow <- data %>%
     select(-1, -2) %>%
     slice(row) %>%
     unlist(., use.names=FALSE)
+
+  # Make a copy to mangle
+  a <- origRow
 
   # Test if character row using perm_chars
   pos_chars <- c("Yes", "High", "Good")
   neg_chars <- c("No", "Low", "Bad")
   perm_chars <- c(pos_chars, neg_chars)
 
-  if (sum(a %in% perm_chars) > 1) {
+  if (sum(origRow %in% perm_chars) > 1) {
     char_row <- TRUE
   } else {
     char_row <- FALSE
-    suppressWarnings(if (class(a) == "character") a <- as.numeric(a))
+    suppressWarnings(
+      if (class(a) == "character") {
+        a <- gsub(",", "", a)
+        a <- as.numeric(a)
+      }
+    )
   }
 
 
@@ -107,10 +115,11 @@ get_row <- function(row, data, skip = 0) {
         TRUE ~ "f"
         )
 
-      col <- str_c("  & \\q", col, "  " , a[x], "  ")
+      # Write cell
+      col <- str_c("  & \\q", col, "  " , origRow[x], "  ")
 
       # Return and send message
-      print(paste0(a[x], " is ", col))
+      print(paste0(origRow[x], " is ", col))
       return(col)
 
     }
@@ -130,8 +139,12 @@ get_row <- function(row, data, skip = 0) {
         if(a[x] >= med + 1.5*sd) col <- codes[10]
         if(a[x] >= med + 2.0*sd) col <- codes[11]
 
-        col <- str_c("  & \\q", col, "  " , a[x], "  ")
+        # Write cell
+        col <- str_c("  & \\q", col, "  " , origRow[x], "  ")
+
       } else {
+
+        # Write cell
         col <- "  &  \\qz  "
       }
 
