@@ -32,6 +32,15 @@ make_metrics_tables <- function(data) {
   make_chapter_metrics_tables(data, useLines = lines)
 
   # Export metrics table data for use in Shiny App
+  export <- data %>%
+    do(zoo::na.locf(.)) %>%
+    rename(chapter = 1, metric = 2) %>%
+    gather(key = "country", value = "value", -1, -2) %>%
+    mutate(country = fct_rev(factor(country)),
+           num = as.numeric(value)) %>%
+    rename(char = value) %>%
+    mutate(isAus = country == "Australia")
+
   readr::write_rds(data, "data/ob_data.Rds")
 
 
