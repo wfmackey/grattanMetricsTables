@@ -123,7 +123,7 @@ create_chapter_metrics <- function(useChapter) {
   tabular_line <- str_c("\\begin{tabular}{l", Rs, "}", collapse = "")
 
   chap_tex_name <- gsub(" ","-", tolower(useChapter))
-  caption_line <- str_c("\\caption{International scorecard on ", tolower(useChapter), "}\\label{tbl:key-performance-metrics-for-", chap_tex_name, "}",
+  caption_line <- str_c("\\caption{International scorecard for ", tolower(useChapter), "}\\label{tbl:key-performance-metrics-for-", chap_tex_name, "}",
                         collapse = "")
 
   table_preamble <- c("\\bgroup \\def\\arraystretch{1.75}",
