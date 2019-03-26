@@ -41,7 +41,7 @@ make_metrics_tables <- function(data) {
     rename(char = value) %>%
     mutate(isAus = country == "Australia")
 
-  readr::write_rds(data, "data/ob_data.Rds")
+  readr::write_rds(export, "data/ob_data.Rds")
 
 
 }
