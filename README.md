@@ -27,14 +27,17 @@ metrics <- read_sheet("1p2oz-9s29IN4M7paosSEG24A3GwVn3uskXP0-3npd4Q",
                       col_types = "c")
 ```
 
-Once the sheet is loaded and assigned to an object, relay that object to the `make_metrics_table` function:
+Once the sheet is loaded and assigned to an object, relay that object to the `make_metrics_tables` function:
 
 ```r
 # Generate the metrics tables:
-make_metrics_table(metrics) 
+make_metrics_tables(metrics) 
 ```
 
-This will produce a `metrics_table.tex` file that contains the 'innards' of the table (i.e. the metrics rows of the table) that can be copied-and-pasted into the table you have built.
+This will produce:
+
+* A `metrics_table.tex` file that contains the 'innards' of the table (i.e. the metrics rows of the table) that can be copied-and-pasted into the table you have built.
+* A folder `chapter_tables` with a `.tex` file for each chapter containing the full table environment.
 
 # Reversing colour order
 The function will look for the word 'higher' in the final column. If it is found, it will designate that column as a reversal instructions where:
