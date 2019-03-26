@@ -31,6 +31,10 @@ make_metrics_tables <- function(data) {
   # Make chapter metrics tables with the same data
   make_chapter_metrics_tables(data, useLines = lines)
 
+  # Export metrics table data for use in Shiny App
+  readr::write_rds(data, "data/ob_data.Rds")
+
+
 }
 
 
