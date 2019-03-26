@@ -13,7 +13,8 @@ Imports:
     readr,
     zoo,
     stringr,
-    tidyr
+    tidyr,
+    forcats
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

@@ -4,6 +4,7 @@
 #' Note that it should be in the format of a metrics table.
 #'
 #' @import dplyr
+#' @importFrom forcats fct_rev
 #'
 #' @export
 
@@ -36,7 +37,7 @@ make_metrics_tables <- function(data) {
     do(zoo::na.locf(.)) %>%
     rename(chapter = 1, metric = 2) %>%
     gather(key = "country", value = "value", -1, -2) %>%
-    mutate(country = fct_rev(factor(country)),
+    mutate(country = forcats::fct_rev(factor(country)),
            num = as.numeric(value)) %>%
     rename(char = value) %>%
     mutate(isAus = country == "Australia")
