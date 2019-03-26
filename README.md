@@ -31,7 +31,7 @@ Once the sheet is loaded and assigned to an object, relay that object to the `ma
 
 ```r
 # Generate the metrics tables:
-make_metrics_table(metrics) 
+make_metrics_tables(metrics) 
 ```
 
 This will produce a `metrics_table.tex` file that contains the 'innards' of the table (i.e. the metrics rows of the table) that can be copied-and-pasted into the table you have built.
