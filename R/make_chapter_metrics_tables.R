@@ -74,11 +74,13 @@ create_chapter_metrics <- function(useChapter) {
     number_of_metrics <- nrow(chap_header)
     em <- 20.76 / number_of_metrics
 
+  # Custom-define column width if Economic development [quick fix :/]
+  if(useChapter == "Economic development") em <- c(4.19, 5.19, 6.19, 5.19)
 
   # Add column spacing/formatting to header
   chap_header <- chap_header %>%
     mutate(metric_names = str_c("\\multicolumn{1}{p{", em, "em}}{\\textbf{", metric_names, "}}"),
-           metric_units = str_c("\\multicolumn{1}{p{", em, "em}}{\\textit{", metric_units, "}}"))
+           metric_units = str_c("\\parbox[b]{", em, "em}{\\raggedleft \\textit{", metric_units, "}}"))
 
   names_line <- chap_header %>% pull(metric_names) %>% str_c(collapse = "   &   ") %>% str_c("&   ", ., " \\\\")
   units_line <- chap_header %>% pull(metric_units) %>% str_c(collapse = "   &   ") %>% str_c("&   ", ., " \\\\")
@@ -108,7 +110,9 @@ create_chapter_metrics <- function(useChapter) {
 
 
   create_lines <- function(x) {
-    as.character(chap[x,]) %>% str_c(collapse = "   &   ") %>% str_c(., " \\\\")
+    as.character(chap[x,]) %>%
+     str_c(collapse = "   &   ") %>%
+       str_c(., " \\\\")
   }
 
   lines <- purrr::map(1:nrow(chap),
