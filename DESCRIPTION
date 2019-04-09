@@ -14,7 +14,8 @@ Imports:
     zoo,
     stringr,
     tidyr,
-    forcats
+    forcats,
+    openxlsx
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

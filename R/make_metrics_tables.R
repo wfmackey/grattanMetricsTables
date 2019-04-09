@@ -10,7 +10,7 @@
 
 
 ## quiets concerns of R CMD check re undefined vars
-globalVariables(c("Australia", "metrics", "."))
+globalVariables(c("Australia", "metrics", ".", "country", "value"))
 
 
 make_metrics_tables <- function(data) {
@@ -46,6 +46,26 @@ make_metrics_tables <- function(data) {
   readr::write_rds(export, "data/ob_data.Rds")
 
 
+  # Export Excel sheet
+    # Generate table
+    chart_data_export <-
+    data %>%
+      do(zoo::na.locf(.)) %>%
+      # Drop 'higher number' column
+      select(-starts_with("Higher"))
+
+    # Set save path
+    chart_data_export_path <- "~/Dropbox (Grattan Institute)/Grattan Report - Commonwealth Orange Book 2019/Final PDF/metrics_chart_data.xlsx"
+
+    # Create and export xlsx worksheet
+    wb <- openxlsx::createWorkbook()
+    openxlsx::addWorksheet(wb, "metrics_chart_data")
+    openxlsx::writeData(wb, "metrics_chart_data", chart_data_export, rowNames = FALSE)
+    openxlsx::saveWorkbook(wb, chart_data_export_path, overwrite = TRUE)
+
+
 }
+
+
 
 
