@@ -76,6 +76,7 @@ create_chapter_metrics <- function(useChapter) {
 
   # Custom-define column width if Economic development [quick fix :/]
   if(useChapter == "Economic development") em <- c(4.19, 5.19, 6.19, 5.19)
+  if(useChapter == "Regional development") em <- c(10.38, 8.38)
 
   # Add column spacing/formatting to header
   chap_header <- chap_header %>%
