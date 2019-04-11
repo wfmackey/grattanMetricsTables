@@ -111,9 +111,12 @@ get_row <- function(row, data, skip = 0) {
       col <- case_when(
         a[x] %in% pos_chars ~ "b",
         a[x] %in% neg_chars ~ "j",
-        a[x] == "--" ~ "z",
+        a[x] == "-" ~ "z",
         TRUE ~ "f"
         )
+
+      # Replace - with --
+      origRow[x] <- ifelse(origRow[x] == "-", "--", origRow[x])
 
       # Write cell
       col <- str_c("  & \\q", col, "  " , origRow[x], "  ")
