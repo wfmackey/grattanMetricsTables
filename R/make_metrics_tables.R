@@ -55,7 +55,15 @@ make_metrics_tables <- function(data) {
       select(-starts_with("Higher"))
 
     # Set save path
-    chart_data_export_path <- "~/Dropbox (Grattan Institute)/Grattan Report - Commonwealth Orange Book 2019/Final PDF/metrics_chart_data.xlsx"
+    chart_data_path <- "~/Dropbox (Grattan Institute)/Grattan Report - Commonwealth Orange Book 2019/Final PDF"
+    if (dir.exists(chart_data_path)) {
+        message("Saving chart data Excel file to Grattan Report - Commonwealth Orange Book 2019/Final PDF")
+        chart_data_export_path <- "~/Dropbox (Grattan Institute)/Grattan Report - Commonwealth Orange Book 2019/Final PDF/metrics_chart_data.xlsx"
+    } else {
+      message("Saving chart data Excel file to data")
+      chart_data_export_path <- "data/metrics_chart_data.xlsx"
+    }
+
 
     # Create and export xlsx worksheet
     wb <- openxlsx::createWorkbook()
