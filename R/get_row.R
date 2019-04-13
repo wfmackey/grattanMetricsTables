@@ -116,7 +116,7 @@ get_row <- function(row, data, skip = 0) {
         )
 
       # Replace - with --
-      origRow[x] <- ifelse(origRow[x] == "-", "--", origRow[x])
+      origRow[x] <- ifelse(origRow[x] == "-", " ", origRow[x])
 
       # Write cell
       col <- str_c("  & \\q", col, "  " , origRow[x], "  ")
